@@ -487,19 +487,53 @@ input:focus { box-shadow: 0 0 0 4px rgba(208,102,58,.18) !important; }
 .mapa .casa { animation: late 2.4s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
 @media (max-width: 720px) { .mapa svg { height: 340px; } .mapa .leyenda { position: static; display: flex; flex-wrap: wrap; gap: 4px 14px; border-radius: 0; border-top: 1px solid var(--line); } }
 /* ───────── galería ───────── */
-.galeria { display: grid; gap: 14px; grid-template-columns: 1.1fr .9fr; }
-@media (max-width: 720px) { .galeria { grid-template-columns: 1fr; } .foto.video { grid-column: auto; grid-row: auto; } }
-.foto { position: relative; border-radius: 16px; overflow: hidden; background: var(--sheet-2); aspect-ratio: 4 / 3; cursor: zoom-in; box-shadow: 0 16px 26px -18px rgba(30,70,70,.55); }
+.galeria { display: grid; gap: 14px; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-auto-rows: 1fr; }
+.foto.alta { grid-column: 1; grid-row: 1 / span 2; aspect-ratio: auto; }
+@media (max-width: 720px) { .galeria { grid-template-columns: 1fr; grid-auto-rows: auto; } .foto.video, .foto.alta { grid-column: auto; grid-row: auto; } .foto.alta { aspect-ratio: 3 / 4; } }
+.foto { margin: 0; position: relative; border-radius: 16px; overflow: hidden; background: var(--sheet-2); aspect-ratio: 4 / 3; cursor: zoom-in; box-shadow: 0 16px 26px -18px rgba(30,70,70,.55); }
 .foto img, .foto video { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .6s var(--ease); }
 .foto:hover img { transform: scale(1.04); }
 .foto figcaption { position: absolute; left: 0; right: 0; bottom: 0; padding: 26px 14px 12px; background: linear-gradient(180deg, transparent, rgba(20,30,28,.75)); color: #fff; font-weight: 700; font-size: 14px; }
-.foto.video { aspect-ratio: auto; cursor: default; grid-column: 2; grid-row: 1 / span 2; min-height: 420px; }
-.foto.video video { object-fit: contain; background: #111; }
+.foto.video { aspect-ratio: auto; cursor: default; grid-column: 2; grid-row: 1 / span 2; min-height: 0; }
+.foto.video video { object-fit: cover; background: #111; }
 .lightbox { position: fixed; inset: 0; background: rgba(13,15,14,.88); z-index: 80; display: grid; place-items: center; padding: 16px; cursor: zoom-out; animation: cambia .25s var(--ease) both; }
 .lightbox img { max-width: 100%; max-height: 100%; border-radius: 12px; box-shadow: 0 30px 60px -20px #000; }
 .dir { display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: center; }
 .dir .ico { width: 54px; height: 54px; border-radius: 50%; background: var(--teja); display: grid; place-items: center; color: #fff; font-size: 26px; }
-@media (max-width: 720px) { .foto.video { max-height: 440px; } }
+@media (max-width: 720px) { .foto.video { max-height: 440px; min-height: 380px; } .foto.video video { object-fit: contain; } }
+</style>
+<style>
+/* ───────── Capa riso: papel con fibras, tintas fuera de registro y sellos impresos ───────── */
+html.riso body::before { content: ""; position: fixed; inset: 0; background-image: var(--riso-paper); background-size: 240px 240px; opacity: .42; pointer-events: none; z-index: 2147483000; }
+/* títulos como tinta a dos pasadas (naranja debajo, un poco corrida) */
+.hero h1 { text-shadow: 2.5px 1.5px 0 rgba(208,102,58,.28); }
+.hero h1 b { text-shadow: 2.5px 1.5px 0 rgba(74,123,200,.45); }
+.banner { position: relative; box-shadow: 3px 3px 0 0 rgba(74,123,200,.55), 0 12px 18px -12px rgba(120,50,20,.7) !important; }
+.banner h2 { text-shadow: 1.5px 1px 0 rgba(255,228,0,.55); }
+nav.tabs button[aria-selected="true"] { box-shadow: 2.5px 2.5px 0 0 rgba(74,123,200,.6) !important; }
+.btn { box-shadow: 3px 3px 0 var(--teja-d), 5px 5px 0 rgba(74,123,200,.45) !important; }
+.btn:active { box-shadow: 1px 1px 0 var(--teja-d) !important; }
+.card { box-shadow: inset 0 0 0 1px rgba(234,223,208,.9), 3px 3px 0 rgba(208,102,58,.16), 0 16px 26px -18px rgba(30,70,70,.55); }
+.hero .sum > div { box-shadow: 3px 3px 0 rgba(74,123,200,.32), 0 10px 16px -10px rgba(30,60,60,.55); }
+.big { text-shadow: 1.6px 1.2px 0 rgba(255,228,0,.6); }
+.hero .sum .v { text-shadow: 1.6px 1.2px 0 rgba(255,255,255,.7); }
+
+/* sol impreso que gira detrás del logo */
+.logowrap { position: relative; }
+.riso-sol { position: absolute; left: 50%; top: 50%; width: min(126%, 580px); aspect-ratio: 1; transform: translate(-50%, -52%); pointer-events: none; opacity: .92; mix-blend-mode: multiply; }
+.logofig { position: relative; }
+@media (max-width: 720px) { .riso-sol { width: 112%; } }
+
+/* sellos impresos junto a cada título de sección */
+.sec.con-sello { position: relative; padding-right: 150px; min-height: 92px; }
+.sello-sec { position: absolute; right: 0; top: -8px; width: 150px; aspect-ratio: 4 / 3; border-radius: 10px; transform: rotate(4deg); box-shadow: 2px 3px 0 rgba(74,123,200,.35), 0 12px 18px -12px rgba(30,60,60,.6); background: #F7F0E2; }
+@media (max-width: 720px) { .sec.con-sello { padding-right: 112px; min-height: 80px; } .sello-sec { width: 108px; top: -4px; } }
+
+/* sello de salud, estampado en la esquina de la tarjeta */
+.con-sello-salud { position: relative; }
+.sello-salud { position: absolute; right: 10px; top: -16px; width: 150px; aspect-ratio: 11 / 6; pointer-events: none; mix-blend-mode: multiply; }
+@media (max-width: 720px) { .sello-salud { width: 104px; right: 4px; top: -16px; } }
+@media (prefers-reduced-motion: reduce) { html.riso body::before { opacity: .4; } }
 </style>
 
 <div id="top"></div>
@@ -628,7 +662,7 @@ function celebrar(titulo, sub) {
 function charroSVG() {
   const K = "#1F5C38", W = "#FFF8EE";
   // toro (mira a la derecha)
-  const toro = `<g id="toro" class="toro">
+  const toro = `<g id="toro" class="toro" filter="url(#risoInk)">
     <g class="sombra"><ellipse cx="34" cy="37" rx="30" ry="3" fill="#000" opacity=".12"/></g>
     <g class="cuerpo">
       <path class="cola" d="M8 16 C 2 12, 0 6, 4 2" fill="none" stroke="${K}" stroke-width="2.4" stroke-linecap="round"/>
@@ -643,7 +677,7 @@ function charroSVG() {
       <g class="pata p4"><rect x="50" y="26" width="5" height="12" rx="2" fill="${K}"/></g>
     </g></g>`;
   // caballo con charro (mira a la derecha)
-  const charro = `<g id="charro" class="charro">
+  const charro = `<g id="charro" class="charro" filter="url(#risoInk)">
     <ellipse cx="40" cy="42" rx="34" ry="3" fill="#000" opacity=".12"/>
     <g class="cuerpo">
       <path class="crin" d="M10 16 C 2 12, -2 18, 2 24" fill="none" stroke="${K}" stroke-width="3" stroke-linecap="round"/>
@@ -665,6 +699,11 @@ function charroSVG() {
       </g>
     </g></g>`;
   return `<svg class="cola-escena" viewBox="0 0 1000 60" preserveAspectRatio="xMinYMax slice" aria-hidden="true">
+    <defs><filter id="risoInk" x="-20%" y="-30%" width="140%" height="160%" color-interpolation-filters="sRGB">
+      <feOffset in="SourceAlpha" dx="2.2" dy="1.4" result="o"/><feFlood flood-color="#FF6C2F" flood-opacity=".85"/><feComposite in2="o" operator="in" result="naranja"/>
+      <feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="3" result="ruido"/><feColorMatrix in="ruido" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .55 .45" result="grano"/>
+      <feComposite in="SourceGraphic" in2="grano" operator="in" result="verde"/>
+      <feMerge><feMergeNode in="naranja"/><feMergeNode in="verde"/></feMerge></filter></defs>
     <g class="polvo"><circle cx="0" cy="54" r="4" fill="${W}"/><circle cx="12" cy="50" r="6" fill="${W}"/><circle cx="26" cy="54" r="4" fill="${W}"/></g>
     ${toro}${charro}</svg>`;
 }
@@ -738,10 +777,13 @@ function vLocal() {
   const o = DEFAULT_CONFIG.origen, gm = `https://www.google.com/maps/search/?api=1&query=${o.lat},${o.lng}`;
   const dir = `<div class="card"><div class="dir"><div class="ico" aria-hidden="true">📍</div><div><h3 style="font-size:20px">${esc(o.direccion)}</h3><p class="sub" style="margin:4px 0 10px">Abierto todos los días de ${M.P.Hora_apertura}:00 a ${M.P.Hora_cierre}:00. Inauguración ${fmtD(S.cfg.params.Fecha_apertura)}.</p>
     <a class="btn" href="${gm}" target="_blank" rel="noopener" style="display:inline-block;text-decoration:none">Cómo llegar (Google Maps)</a></div></div></div>`;
-  const fotos = `<div class="card"><h3>El local</h3><p class="sub">Así va quedando: la fachada con el mueble de acero y el comedor con las 8 mesas.</p>
-    <div class="galeria"><figure class="foto" data-full="${GAL}local-fachada.jpg"><img src="${GAL}local-fachada.jpg" alt="Fachada del local con el mueble de acero inoxidable" loading="lazy"><figcaption>Llegó el mueble de acero</figcaption></figure>
+  const fotos = `<div class="card"><h3>El local</h3><p class="sub">Así va quedando: el letrero ya está puesto, llegó el mueble de acero y el comedor tiene sus 8 mesas.</p>
+    <div class="galeria">
+      <figure class="foto alta" data-full="${GAL}local-letrero.jpg"><img src="${GAL}local-letrero.jpg" alt="Fachada del local con el letrero de El Jalisciense Birriería" loading="lazy"><figcaption>Ya con el letrero y el logo en la fachada</figcaption></figure>
+      <figure class="foto video"><video controls playsinline preload="none" poster="${GAL}recorrido-poster.jpg" src="${GAL}recorrido-local.mp4"></video><figcaption>Recorrido por el local</figcaption></figure>
+      <figure class="foto" data-full="${GAL}local-fachada.jpg"><img src="${GAL}local-fachada.jpg" alt="Fachada del local con el mueble de acero inoxidable" loading="lazy"><figcaption>Llegó el mueble de acero</figcaption></figure>
       <figure class="foto" data-full="${GAL}local-comedor.jpg"><img src="${GAL}local-comedor.jpg" alt="Comedor con mesas de madera y sillas negras" loading="lazy"><figcaption>El comedor: 8 mesas, 32 sillas</figcaption></figure>
-      <figure class="foto video"><video controls playsinline preload="none" poster="${GAL}recorrido-poster.jpg" src="${GAL}recorrido-local.mp4"></video><figcaption>Recorrido por el local</figcaption></figure></div></div>`;
+    </div></div>`;
   const mapa = `<div class="card"><h3>La zona</h3><p class="sub">Dónde está el local y las birrierías cercanas. Acerca con los botones, la rueda del ratón o con dos dedos; arrastra para moverte; toca un punto para ver sus datos.</p>${mapaSVG()}
     <p class="foot">Mapa esquemático: las distancias son reales (en línea recta) y las avenidas, un trazo aproximado. Para calles y tráfico, abre Google Maps.</p></div>`;
   return sec("El local", "dónde está y cómo va") + dir + fotos + mapa;
@@ -750,6 +792,339 @@ function bindLocal() {
   bindMapa();
   document.querySelectorAll(".foto[data-full]").forEach(f => f.addEventListener("click", () => { const lb = document.createElement("div"); lb.className = "lightbox"; lb.innerHTML = `<img src="${f.dataset.full}" alt="">`; lb.onclick = () => lb.remove(); document.body.appendChild(lb); }));
 }
+
+// ───────── RISO: motor de impresión risográfica para el tablero ─────────
+// Adaptado del "Popol Vuh Riso Test": cada forma se dibuja como cobertura de tinta en una
+// separación (verde / naranja / amarillo); cada separación se trama con su propio ángulo,
+// se desplaza un poco fuera de registro y se multiplica sobre papel con fibras.
+const Riso = (() => {
+  const TAU = Math.PI * 2;
+  const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x));
+  const lerp = (a, b, t) => a + (b - a) * t;
+  function hash(a, b, s) {
+    let h = Math.imul(a | 0, 374761393) ^ Math.imul(b | 0, 668265263) ^ Math.imul((s | 0) + 1013, 1274126177);
+    h = Math.imul(h ^ (h >>> 13), 1103515245); h ^= h >>> 16;
+    return (h >>> 0) / 4294967296;
+  }
+  function vnoise(x, y, s = 0) {
+    const xi = Math.floor(x), yi = Math.floor(y), xf = x - xi, yf = y - yi;
+    const u = xf * xf * (3 - 2 * xf), v = yf * yf * (3 - 2 * yf);
+    const a = hash(xi, yi, s), b = hash(xi + 1, yi, s), c = hash(xi, yi + 1, s), d = hash(xi + 1, yi + 1, s);
+    return a + (b - a) * u + (c - a) * v + (a - b - c + d) * u * v;
+  }
+  function rng(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+
+  // Tintas de riso reales, elegidas para el tablero: verde (marca), naranja (teja) y amarillo.
+  const INKS_DEF = {
+    green:  { rgb: [0, 120, 80],   ang: 15, off: [0, 0] },
+    orange: { rgb: [255, 108, 47], ang: 75, off: [1.8, -1.3] },
+    yellow: { rgb: [255, 228, 0],  ang: 0,  off: [-1.6, 1.5] },
+    blue:   { rgb: [0, 120, 191],  ang: 45, off: [1.2, 1.4] },
+  };
+
+  // Papel: color base, fibras, motas y una variación lenta de tono. Devuelve {r,g,b} por pixel.
+  function paper(W, H, q, base, seed) {
+    const N = W * H, pc = document.createElement("canvas"); pc.width = W; pc.height = H; const p = pc.getContext("2d");
+    p.fillStyle = `rgb(${base})`; p.fillRect(0, 0, W, H);
+    const pr = rng(seed);
+    const nf = Math.round(W * H / 350 * q);
+    for (let i = 0; i < nf; i++) {
+      const x = pr() * W, y = pr() * H, l = (4 + pr() * 18) * q, an = pr() * TAU;
+      p.strokeStyle = `rgba(${pr() < .5 ? "110,92,60" : "255,255,255"},${.05 + pr() * .07})`; p.lineWidth = .6 * q;
+      p.beginPath(); p.moveTo(x, y); p.quadraticCurveTo(x + Math.cos(an) * l * .5 + pr() * 3, y + Math.sin(an) * l * .5, x + Math.cos(an) * l, y + Math.sin(an) * l); p.stroke();
+    }
+    for (let i = 0; i < nf * .35; i++) { p.fillStyle = `rgba(80,60,40,${.08 + pr() * .15})`; p.fillRect(pr() * W, pr() * H, q * (.6 + pr()), q * (.6 + pr())); }
+    const pd = p.getImageData(0, 0, W, H).data, R = new Uint8ClampedArray(N), G = new Uint8ClampedArray(N), B = new Uint8ClampedArray(N);
+    const ts = 1 / (220 * q), r = rng(seed + 1);
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+      const i = y * W + x, f = 1 - .035 * vnoise(x * ts, y * ts, 77) - .018 * r();
+      R[i] = pd[i * 4] * f; G[i] = pd[i * 4 + 1] * f; B[i] = pd[i * 4 + 2] * f;
+    }
+    return { R, G, B, canvas: pc };
+  }
+
+  // Una "prensa": separaciones + tramas + papel para un lienzo dado.
+  function press(out, opts) {
+    const BW = opts.w, BH = opts.h, q = opts.q || 1, inks = opts.inks || ["green", "orange", "yellow"];
+    const W = Math.round(BW * q), H = Math.round(BH * q), N = W * H, CELL = (opts.cell || 5.2) * q, GRAIN = opts.grain ?? .24;
+    out.width = W; out.height = H;
+    const octx = out.getContext("2d"), oimg = octx.createImageData(W, H);
+    const S = {}, THR = {}, MOT = {};
+    inks.forEach((k, j) => {
+      const cv = document.createElement("canvas"); cv.width = W; cv.height = H;
+      S[k] = { cv, ctx: cv.getContext("2d", { willReadFrequently: true }) };
+      const a = INKS_DEF[k].ang * Math.PI / 180, ca = Math.cos(a), sa = Math.sin(a);
+      const T = new Float32Array(N), M = new Float32Array(N), ms = 1 / (95 * q), seed = j * 101 + 7;
+      for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+        const u = (x * ca + y * sa) / CELL, v = (-x * sa + y * ca) / CELL, i = y * W + x;
+        T[i] = 1 - ((Math.cos(TAU * u) + Math.cos(TAU * v)) * .25 + .5);
+        M[i] = .86 + .14 * (.65 * vnoise(x * ms, y * ms, seed) + .35 * vnoise(x * ms * 3.7, y * ms * 3.7, seed + 3));
+      }
+      THR[k] = T; MOT[k] = M;
+    });
+    const r = rng(99), GR = new Float32Array(N); for (let i = 0; i < N; i++) GR[i] = r() - .5;
+    const TRANSP = !!opts.transparent;
+    const PAP = paper(W, H, q, TRANSP ? [255, 255, 255] : (opts.paper || [244, 238, 226]), opts.seed || 5);
+    if (TRANSP) for (let i = 0; i < N; i++) { PAP.R[i] = PAP.G[i] = PAP.B[i] = 255; } // sin papel: solo la tinta, para imprimir sobre la página
+    let BO = 0, MIS = 1;
+    const each = fn => inks.forEach(k => fn(S[k].ctx, k));
+    const api = {
+      W: BW, H: BH, Q: q, S, inks, hash, vnoise, rng, clamp, lerp, TAU,
+      setBO(b) { BO = b; }, get BO() { return BO; }, set MIS(m) { MIS = m; },
+      begin() { MIS = 1; each(c => { c.setTransform(q, 0, 0, q, 0, 0); c.globalCompositeOperation = "source-over"; c.globalAlpha = 1; c.clearRect(-9e3, -9e3, 2e4, 2e4); }); },
+      push(fn) { each(c => { c.save(); fn && fn(c); }); },
+      pop() { each(c => c.restore()); },
+      LG: (x0, y0, x1, y1, st) => c => { const g = c.createLinearGradient(x0, y0, x1, y1); for (const [o, a] of st) g.addColorStop(o, `rgba(0,0,0,${clamp(a)})`); return g; },
+      RG: (x, y, r0, r1, st) => c => { const g = c.createRadialGradient(x, y, r0, x, y, Math.max(r0 + .01, r1)); for (const [o, a] of st) g.addColorStop(o, `rgba(0,0,0,${clamp(a)})`); return g; },
+      /* ink(path, receta, opciones): receta = {green: v, orange: v, yellow: v}, v = cobertura 0..1 o gradiente.
+         modo 'paint' (default): borra lo que hay debajo en esas tintas y pone v; 'over': sobreimprime; 'knock': quita tinta. */
+      ink(path, rec, o = {}) {
+        const mode = o.mode || "paint";
+        for (const k in rec) {
+          if (!S[k]) continue;
+          const v = rec[k]; if (v === undefined || v === null) continue;
+          if (mode !== "paint" && v === 0) continue;
+          const c = S[k].ctx;
+          const style = typeof v === "number" ? `rgba(0,0,0,${clamp(v)})` : v(c);
+          const draw = st => {
+            if (o.text) { c.font = o.font; c.textAlign = o.align || "center"; c.textBaseline = o.baseline || "alphabetic"; if (o.w) { c.lineWidth = o.w; c.lineJoin = "round"; c.strokeStyle = st; c.strokeText(o.text, path[0], path[1]); } else { c.fillStyle = st; c.fillText(o.text, path[0], path[1]); } return; }
+            c.beginPath(); path(c);
+            if (o.w) { c.lineWidth = o.w; c.lineCap = "round"; c.lineJoin = "round"; c.strokeStyle = st; c.stroke(); }
+            else { c.fillStyle = st; c.fill(o.rule || "nonzero"); }
+          };
+          if (mode === "knock") { c.globalCompositeOperation = "destination-out"; draw(style); }
+          else {
+            if (mode === "paint") { c.globalCompositeOperation = "destination-out"; draw("#000"); }
+            if (v) { c.globalCompositeOperation = "source-over"; draw(style); }
+          }
+          c.globalCompositeOperation = "source-over";
+        }
+      },
+      // geometría a mano: curva suave por puntos, temblor fijo + "hervor" por cuadro
+      curve(c, A, closed = true) {
+        const n = A.length; if (n < 2) return;
+        if (closed) { c.moveTo((A[n - 1][0] + A[0][0]) / 2, (A[n - 1][1] + A[0][1]) / 2); for (let i = 0; i < n; i++) { const p = A[i], qq = A[(i + 1) % n]; c.quadraticCurveTo(p[0], p[1], (p[0] + qq[0]) / 2, (p[1] + qq[1]) / 2); } c.closePath(); }
+        else { c.moveTo(A[0][0], A[0][1]); for (let i = 1; i < n - 1; i++) c.quadraticCurveTo(A[i][0], A[i][1], (A[i][0] + A[i + 1][0]) / 2, (A[i][1] + A[i + 1][1]) / 2); c.lineTo(A[n - 1][0], A[n - 1][1]); }
+      },
+      wob(A, amp = 1, seed = 0, freq = .35, boil = .55) {
+        return A.map((p, i) => [p[0] + (vnoise(i * freq, seed * 1.37, seed) - .5) * 2 * amp + (hash(i, BO, seed) - .5) * boil, p[1] + (vnoise(i * freq + 40, seed * 1.37, seed + 5) - .5) * 2 * amp + (hash(i + 999, BO, seed) - .5) * boil]);
+      },
+      // rectángulo muestreado por sus orillas (para que wob no lo redondee)
+      rectPts(x, y, w, h, n = 6) { const A = []; for (let i = 0; i < n; i++) A.push([x + w * i / n, y]); for (let i = 0; i < n; i++) A.push([x + w, y + h * i / n]); for (let i = 0; i < n; i++) A.push([x + w - w * i / n, y + h]); for (let i = 0; i < n; i++) A.push([x, y + h - h * i / n]); return A; },
+      circPts(x, y, r, n, ry = r, a0 = 0) { const A = []; for (let i = 0; i < n; i++) { const a = a0 + i / n * TAU; A.push([x + Math.cos(a) * r, y + Math.sin(a) * ry]); } return A; },
+      // cinta ahusada alrededor de una polilínea: hw(u) da el medio ancho
+      ribbon(A, hw) {
+        const n = A.length, Lf = [], Rt = [];
+        for (let i = 0; i < n; i++) {
+          const a = A[Math.max(0, i - 1)], b = A[Math.min(n - 1, i + 1)];
+          let dx = b[0] - a[0], dy = b[1] - a[1]; const l = Math.hypot(dx, dy) || 1; dx /= l; dy /= l;
+          const w = hw(i / (n - 1), i);
+          Lf.push([A[i][0] - dy * w, A[i][1] + dx * w]); Rt.push([A[i][0] + dy * w, A[i][1] - dx * w]);
+        }
+        return Lf.concat(Rt.reverse());
+      },
+      // puntos a lo largo de una curva cuadrática (x0,y0)-(cx,cy)-(x1,y1)
+      qpts(x0, y0, cx, cy, x1, y1, n = 12) { const A = []; for (let i = 0; i <= n; i++) { const t = i / n, u = 1 - t; A.push([u * u * x0 + 2 * u * t * cx + t * t * x1, u * u * y0 + 2 * u * t * cy + t * t * y1]); } return A; },
+      P: {
+        full: c => c.rect(-6000, -6000, 13000, 13000),
+        rect: (x, y, w, h) => c => c.rect(x, y, w, h),
+        rrect: (x, y, w, h, r) => c => { c.moveTo(x + r, y); c.arcTo(x + w, y, x + w, y + h, r); c.arcTo(x + w, y + h, x, y + h, r); c.arcTo(x, y + h, x, y, r); c.arcTo(x, y, x + w, y, r); c.closePath(); },
+        circ: (x, y, r) => c => { c.moveTo(x + r, y); c.arc(x, y, Math.max(0, r), 0, TAU); },
+        ell: (x, y, rx, ry, rot = 0) => c => c.ellipse(x, y, Math.max(0, rx), Math.max(0, ry), rot, 0, TAU),
+        pts: (A, closed = true) => c => api.curve(c, A, closed),
+        poly: A => c => { c.moveTo(A[0][0], A[0][1]); for (let i = 1; i < A.length; i++) c.lineTo(A[i][0], A[i][1]); c.closePath(); },
+      },
+      // Tramar cada separación y multiplicarla sobre el papel. gain[k] = cuánto de esa tinta ya "pasó por la prensa" (0..1).
+      composite(gain) {
+        const outd = oimg.data, inv = 1 / 255;
+        for (let i = 0; i < N; i++) { const o = i * 4; outd[o] = PAP.R[i]; outd[o + 1] = PAP.G[i]; outd[o + 2] = PAP.B[i]; outd[o + 3] = 255; }
+        inks.forEach((k, j) => {
+          const g = gain ? (gain[k] ?? 1) : 1; if (g <= 0) return;
+          const cov = S[k].ctx.getImageData(0, 0, W, H).data, T = THR[k], M = MOT[k], f = INKS_DEF[k].rgb.map(v => 1 - v / 255);
+          const dx = Math.round((INKS_DEF[k].off[0] * MIS + (hash(BO, j, 3) - .5) * 1.1) * q), dy = Math.round((INKS_DEF[k].off[1] * MIS + (hash(BO, j, 4) - .5) * 1.1) * q);
+          const sh = dy * W + dx, go = (Math.imul(BO + 1, 7919) + j * 104729) % N;
+          for (let i = 0; i < N; i++) {
+            const jj = i - sh; if (jj < 0 || jj >= N) continue;
+            const c = cov[jj * 4 + 3]; if (!c) continue;
+            let gi = i + go; if (gi >= N) gi -= N;
+            let a = ((c * inv * g) * 1.32 - .1 - T[i] - GR[gi] * GRAIN) * 6 + .5;
+            if (a > 0) { if (a > 1) a = 1; a *= M[i]; const o = i * 4; outd[o] *= 1 - a * f[0]; outd[o + 1] *= 1 - a * f[1]; outd[o + 2] *= 1 - a * f[2]; }
+          }
+        });
+        if (TRANSP) { // separar la tinta del blanco: color sin premultiplicar + alfa por cobertura
+          for (let i = 0; i < N; i++) { const o = i * 4, r = outd[o], g = outd[o + 1], b = outd[o + 2], m = Math.min(r, g, b), al = 1 - m / 255;
+            if (al <= .004) { outd[o + 3] = 0; continue; }
+            outd[o] = 255 - (255 - r) / al; outd[o + 1] = 255 - (255 - g) / al; outd[o + 2] = 255 - (255 - b) / al; outd[o + 3] = al * 255; }
+        }
+        octx.putImageData(oimg, 0, 0);
+      },
+    };
+    return api;
+  }
+
+  // Azulejo de papel para el fondo de toda la página (data URL, se genera una vez).
+  function paperTile(size = 220) {
+    const cv = document.createElement("canvas"); cv.width = cv.height = size; const p = cv.getContext("2d");
+    const pr = rng(31);
+    for (let i = 0; i < 260; i++) {
+      const x = pr() * size, y = pr() * size, l = 4 + pr() * 16, an = pr() * TAU;
+      p.strokeStyle = `rgba(${pr() < .55 ? "110,92,60" : "255,255,255"},${.08 + pr() * .1})`; p.lineWidth = .7;
+      p.beginPath(); p.moveTo(x, y); p.quadraticCurveTo(x + Math.cos(an) * l * .5 + pr() * 3, y + Math.sin(an) * l * .5, x + Math.cos(an) * l, y + Math.sin(an) * l); p.stroke();
+    }
+    for (let i = 0; i < 120; i++) { p.fillStyle = `rgba(80,60,40,${.12 + pr() * .18})`; p.fillRect(pr() * size, pr() * size, .7 + pr(), .7 + pr()); }
+    return cv.toDataURL("image/png");
+  }
+
+  return { press, paperTile, INKS: INKS_DEF, hash, vnoise, rng };
+})();
+
+// ───────── Riso en la interfaz: sol impreso tras el logo, sellos por sección, sello de salud y papel ─────────
+// Cada "impresión" es un canvas chico que pasa por la prensa (Riso.press): tres pasadas de tinta y luego un hervor lento.
+const RisoUI = (() => {
+  const prints = new Map(); // canvas -> estado
+  let io = null, raf = 0;
+  const rmq = () => (typeof RM !== "undefined" ? RM : matchMedia("(prefers-reduced-motion: reduce)").matches);
+
+  function loop(now) {
+    raf = 0; let any = false;
+    prints.forEach(st => {
+      if (!st.visible || st.dead) return;
+      if (st.t0 === null) st.t0 = now; st.age = (now - st.t0) / 1000;
+      if (!st.printed) { const r = (a, d) => Math.max(0, Math.min(1, (st.age - a) / d)); st.gain = { yellow: r(0, .35), orange: r(.3, .35), green: r(.62, .4), blue: r(.62, .4) }; if (st.age > 1.1) { st.printed = true; st.gain = null; } }
+      if (now - st.last >= 80) { st.bo++; st.draw(now); st.last = now; } // 12 cuadros por segundo: animación "a doses", como en imprenta
+      if (!st.printed || st.anim) any = true;
+    });
+    if (any && !document.hidden) raf = requestAnimationFrame(loop);
+  }
+  const kick = () => { if (!raf && !document.hidden) raf = requestAnimationFrame(loop); };
+  document.addEventListener("visibilitychange", kick);
+
+  // print(canvas, fn(R, t, st), opts): fn dibuja en coordenadas base w×h; se vuelve a tramar en cada cuadro.
+  function print(cv, fn, o = {}) {
+    if (!cv || typeof Riso === "undefined" || prints.has(cv)) return;
+    const q = o.q || (Math.min(innerWidth, 900) < 600 ? .6 : .8);
+    const R = Riso.press(cv, { w: o.w, h: o.h, q, inks: o.inks || ["yellow", "orange", "green"], cell: o.cell || 4.6, paper: o.paper || [247, 240, 226], seed: o.seed || 5, grain: o.grain, transparent: o.transparent });
+    const st = { R, fn, bo: 0, gain: { yellow: 0, orange: 0, green: 0, blue: 0 }, t0: null, age: 0, printed: false, visible: false, last: 0, anim: o.anim !== false, dead: false,
+      draw(now) { const t0 = performance.now(); R.setBO(st.bo); R.begin(); fn(R, st.age, st); const t1 = performance.now(); R.composite(st.gain); st.ms = [t1 - t0, performance.now() - t1]; } };
+    prints.set(cv, st);
+    if (rmq()) { st.printed = true; st.gain = null; st.age = 2.3; st.draw(performance.now()); return; } // sin movimiento: una sola impresión, ya terminada
+    if (!io) io = new IntersectionObserver(es => es.forEach(e => { const s = prints.get(e.target); if (s) { s.visible = e.isIntersecting; if (s.visible) kick(); } }), { threshold: .02 });
+    io.observe(cv);
+    R.begin(); R.composite(st.gain); // papel en blanco mientras entra a la vista
+  }
+  function sweep() { prints.forEach((st, cv) => { if (!cv.isConnected) { st.dead = true; if (io) io.unobserve(cv); prints.delete(cv); } }); }
+
+  /* ───── ilustraciones animadas (coordenadas base; t = segundos desde que entró a la vista) ───── */
+  const eob = t => { t = Math.max(0, Math.min(1, t)); const n1 = 7.5625, d1 = 2.75; return t < 1 / d1 ? n1 * t * t : t < 2 / d1 ? n1 * (t -= 1.5 / d1) * t + .75 : t < 2.5 / d1 ? n1 * (t -= 2.25 / d1) * t + .9375 : n1 * (t -= 2.625 / d1) * t + .984375; };
+  const eo = t => 1 - Math.pow(1 - Math.max(0, Math.min(1, t)), 3);
+  const trim = (A, k) => { k = Math.max(0, Math.min(1, k)); const n = Math.max(2, Math.round(1 + (A.length - 1) * k)); return A.slice(0, n); };
+  // Sol con rayos que giran despacio y respira, detrás del logo (560×560)
+  function sol(R, t) {
+    const { P, ink, wob, circPts, RG } = R, cx = 280, cy = 280, a0 = t * .07, br = 1 + .025 * Math.sin(t * 1.1);
+    for (let i = 0; i < 18; i++) {
+      const a = a0 + i / 18 * R.TAU, L = (i % 2 ? 250 : 278) * br, w = .08;
+      const A = [[cx + Math.cos(a - w) * 194, cy + Math.sin(a - w) * 194], [cx + Math.cos(a) * L, cy + Math.sin(a) * L], [cx + Math.cos(a + w) * 194, cy + Math.sin(a + w) * 194]];
+      ink(P.pts(wob(A, 1.2, 50 + i, .5, .8)), { yellow: i % 2 ? .62 : .82 }, { mode: "over" });
+    }
+    ink(P.pts(wob(circPts(cx, cy, 190 * br, 52), 2.4, 3)), { orange: RG(cx - 30, cy - 40, 40, 198, [[0, .96], [.75, .9], [1, .62]]), yellow: .5 }, { mode: "over" });
+  }
+  // Monedas que caen y se apilan sobre un billete (Lo invertido) 240×180
+  function monedas(R, t) {
+    const { P, ink, wob, circPts } = R, T = t % 6;
+    R.push(c => { c.translate(150, 96); c.rotate(-.22 + .02 * Math.sin(t * .9)); c.translate(-150, -96); });
+    ink(P.poly(wob(R.rectPts(66, 60, 168, 74, 8), 1.4, 11, .6, .5)), { green: .95 });
+    ink(P.poly(wob(R.rectPts(80, 72, 140, 50, 6), 1, 12, .6, .4)), { green: 1 }, { mode: "knock", w: 2.5 });
+    ink(P.circ(150, 97, 20), { green: 1 }, { mode: "knock", w: 2.5 });
+    ink([150, 108], { green: 1 }, { mode: "knock", text: "$", font: "800 30px Fredoka, sans-serif" });
+    R.pop();
+    const moneda = (x, y, i, s) => { ink(P.pts(wob(circPts(x, y, 44, 30, 15), 1.2, s + i)), { yellow: .95, orange: .22, green: 0 }); ink(P.pts(wob(circPts(x, y, 44, 30, 15), 1.2, s + 9)), { orange: 1 }, { mode: "knock", w: 2.5 }); };
+    const pila = (x, yb, n, s, t0) => { for (let i = 0; i < n; i++) { const k = eob((T - t0 - i * .35) / .7); if (k <= 0) continue; const y = yb - i * 9 - (1 - k) * 170; moneda(x, y, i, s); if (i === n - 1 && k >= 1) { ink(P.pts(wob(circPts(x, y, 30, 24, 10), 1, s + 10)), { orange: .9 }, { w: 2.2 }); ink([x, y + 8], { orange: 1 }, { text: "$", font: "800 22px Fredoka, sans-serif" }); } } };
+    pila(78, 150, 4, 20, .2); pila(166, 160, 5, 30, 1.1);
+  }
+  // Tres personas que van llegando y saludan (La gente) 240×180
+  function gente(R, t) {
+    const { P, ink, wob, circPts } = R;
+    const persona = (x, y, s, rec, esc, dy) => { y += dy; ink(P.pts(wob([[x - 52 * esc, 180], [x - 48 * esc, y + 36], [x - 22 * esc, y + 14], [x + 22 * esc, y + 14], [x + 48 * esc, y + 36], [x + 52 * esc, 180]], 1.6, s)), rec); ink(P.pts(wob(circPts(x, y - 14 * esc, 28 * esc, 30), 1.2, s + 1)), rec); return y; };
+    const llega = (t0) => (1 - eo((t - t0) / .8)) * 130, bob = (ph) => Math.abs(Math.sin(t * 2.6 + ph)) * -4;
+    persona(60, 70, 40, { yellow: .95, orange: .15 }, .95, llega(.6) + bob(0)); persona(186, 66, 44, { orange: .95 }, .98, llega(1.2) + bob(1.3));
+    const ym = persona(122, 50, 48, { green: 1, orange: 0, yellow: 0 }, 1, llega(0) + bob(2.1));
+    const saludo = Math.max(0, Math.sin(t * 1.4)) * 10; // levanta el sombrero
+    ink(P.ell(122, ym - 28 - saludo, 50, 7), { green: 1 }, { mode: "knock" }); ink(P.ell(122, ym - 28 - saludo, 50, 7), { orange: .9 }, { mode: "over" }); ink(P.ell(122, ym - 38 - saludo, 18, 12), { orange: .9 }, { mode: "over" });
+  }
+  // Tablita: las palomitas se van marcando una por una (Pendientes) 240×180
+  function lista(R, t) {
+    const { P, ink, wob } = R, T = t % 7;
+    R.push(c => { c.translate(120, 90); c.rotate(.07 + .01 * Math.sin(t)); c.translate(-120, -90); });
+    ink(P.poly(wob(R.rectPts(46, 20, 148, 150, 8), 1.4, 60, .6, .5)), { orange: .96 });
+    ink(P.poly(wob(R.rectPts(58, 34, 124, 124, 6), 1, 61, .6, .4)), { orange: 1, yellow: 0 }, { mode: "knock" });
+    ink(P.rrect(96, 8, 48, 22, 6), { green: 1, orange: 0 });
+    [56, 86, 116].forEach((y, i) => {
+      ink(P.rrect(70, y, 18, 18, 4), { green: 1 }, { w: 2.6 });
+      ink(c => { c.moveTo(98, y + 9); c.lineTo(168 - i * 14, y + 9); }, { green: .9 }, { w: 5 });
+      const k = (T - 1 - i * 1.4) / .5; if (k > 0) { const A = trim([[72, y + 9], [76, y + 13], [79, y + 16], [84, y + 9], [88, y + 3], [91, y + 0]], k); if (A.length > 1) ink(P.pts(A, false), { orange: 1 }, { w: 4, mode: "over" }); }
+    });
+    // lápiz que va bajando a la siguiente línea
+    const li = Math.min(2, Math.max(0, Math.floor((T - 1) / 1.4))), py = 56 + li * 30 + 9, px = 96 + eo(((T - 1) % 1.4) / .5) * 16;
+    ink(P.poly(wob([[px + 6, py - 2], [px + 46, py - 34], [px + 54, py - 26], [px + 14, py + 6]], .6, 65, .5, .3)), { green: 1, orange: 0 }); ink(P.poly([[px + 6, py - 2], [px + 14, py + 6], [px, py + 6]]), { orange: 1, green: 0 }); // lápiz
+    R.pop();
+  }
+  // Cazuela de birria humeando y un taco que se asoma (Registrar el día) 240×180
+  function cazuela(R, t) {
+    const { P, ink, wob, circPts, qpts } = R;
+    for (let i = 0; i < 3; i++) { const x0 = 76 + i * 30, A = []; for (let k = 0; k <= 10; k++) { const u = k / 10; A.push([x0 + Math.sin(u * 5 + i + t * 1.6) * (6 + u * 6), 78 - u * 62 - (t * 10 % 8)]); } ink(P.pts(wob(A, .8, 80 + i), false), { orange: .35 + .2 * i }, { w: 4, mode: "over" }); }
+    ink(P.poly(wob([[30, 84], [68, 84], [106, 84], [144, 84], [182, 84], [175, 120], [168, 156], [130, 158], [106, 159], [82, 158], [44, 156], [37, 120]], 1.6, 81, .6, .5)), { orange: .96, yellow: .3 });
+    ink(P.pts(wob(circPts(106, 84, 80, 40, 14), 1.4, 82)), { orange: 1, yellow: 0 }, { mode: "knock" });
+    ink(P.pts(wob(circPts(106, 84, 80, 40, 14), 1.4, 83)), { orange: .95 }, { w: 5 });
+    ink(P.pts(wob(circPts(106, 86, 64, 36, 9), 1.2, 84)), { green: .95, orange: 0 });
+    // burbujas del caldo
+    for (let i = 0; i < 4; i++) { const ph = (t * .7 + i * .37) % 1, x = 72 + i * 22 + Math.sin(i) * 6, r = 3 + 7 * ph; if (ph < .85) ink(P.circ(x, 86 + Math.cos(i) * 4, r), { green: 1 }, { mode: "knock" }); }
+    ink(P.poly(wob(R.rectPts(22, 102, 18, 12, 3), .8, 87, .6, .4)), { orange: .95 }); ink(P.poly(wob(R.rectPts(172, 102, 18, 12, 3), .8, 88, .6, .4)), { orange: .95 });
+    R.push(c => { c.translate(186, 128); c.rotate(-.5 + .08 * Math.sin(t * 2)); c.translate(-196, -128); });
+    ink(P.pts(wob(qpts(150, 130, 196, 60, 242, 130, 14).concat([[242, 136], [150, 136]]), 1.4, 90)), { yellow: .95, orange: .2 });
+    ink(P.poly(wob(R.rectPts(160, 118, 72, 12, 4), 1, 91, .6, .4)), { green: 1, yellow: 0, orange: 0 });
+    R.pop();
+  }
+  // Agave que se mece frente al local (El local) 240×180
+  function agave(R, t) {
+    const { P, ink, wob, ribbon, qpts, circPts } = R;
+    ink(P.pts(wob(circPts(150, 70, 52 * (1 + .03 * Math.sin(t * 1.3)), 36), 2, 100)), { orange: .9, yellow: .5 }, { mode: "over" });
+    const hoja = (ang, L, s, i) => { ang += Math.sin(t * 1.4 + i * .8) * .05; const x0 = 110, y0 = 150, x1 = x0 + Math.cos(ang) * L, y1 = y0 - Math.sin(ang) * L, cx = x0 + Math.cos(ang) * L * .55 + Math.sin(ang) * 12, cy = y0 - Math.sin(ang) * L * .55 + Math.cos(ang) * 12; ink(P.pts(wob(ribbon(qpts(x0, y0, cx, cy, x1, y1, 10), u => 12 * (1 - u) + 1.5), 1, s)), { green: 1, orange: 0, yellow: 0 }); };
+    [.22, .52, .85, 1.2, 1.55, 1.9, 2.3, 2.75].forEach((a, i) => hoja(a, 70 + (i % 3) * 18, 110 + i, i));
+    ink(P.poly(wob([[78, 150], [110, 150], [142, 150], [138, 164], [134, 178], [110, 179], [86, 178], [82, 164]], 1.2, 120, .6, .5)), { orange: .96, yellow: .3 });
+    ink(P.poly(wob(R.rectPts(72, 144, 76, 12, 4), 1, 121, .6, .4)), { orange: 1, yellow: .35 });
+    // pajarito que cruza
+    const bx = ((t * 38) % 330) - 40, by = 36 + Math.sin(t * 3) * 4, fl = Math.sin(t * 14) * 6;
+    ink(c => { c.moveTo(bx - 10, by - fl); c.quadraticCurveTo(bx - 4, by + 3, bx, by); c.quadraticCurveTo(bx + 4, by + 3, bx + 10, by - fl); }, { green: 1 }, { w: 2.4 });
+  }
+  // Sello de salud (220×120): cae como sello de goma y luego tiembla
+  function sello(txt, cls) {
+    return (R, t) => {
+      const { P, ink, wob, circPts } = R, rec = cls === "ok" ? { green: 1 } : cls === "mid" ? { orange: 1 } : { orange: 1, green: .55 };
+      const k = eo(t / .35), sc = 1.6 - .6 * k;
+      R.push(c => { c.translate(110, 60); c.rotate(-.09 - (1 - k) * .3); c.scale(sc, sc); c.translate(-110, -60); });
+      ink(P.pts(wob(circPts(110, 60, 100, 48, 46), 1.4, 130)), rec, { w: 5 });
+      ink(P.pts(wob(circPts(110, 60, 90, 44, 38), 1.2, 131)), rec, { w: 2 });
+      ink([110, 72], rec, { text: txt, font: "800 30px Fredoka, sans-serif" });
+      [[26, 60], [194, 60]].forEach(([x, y]) => ink(P.circ(x, y, 3.5), rec));
+      R.pop();
+    };
+  }
+
+  const SELLOS = { monedas, gente, lista, cazuela, agave };
+  function init(root = document) {
+    sweep();
+    const sol_ = root.querySelector("canvas.riso-sol"); if (sol_) print(sol_, sol, { w: 560, h: 560, q: Math.min(innerWidth, 900) < 600 ? .42 : .6, cell: 5.2, transparent: true });
+    root.querySelectorAll("canvas.sello-sec[data-sello]").forEach(cv => { const fn = SELLOS[cv.dataset.sello]; if (fn) print(cv, fn, { w: 240, h: 180, seed: 7 + cv.dataset.sello.length }); });
+    root.querySelectorAll("canvas.sello-salud[data-texto]").forEach(cv => print(cv, sello(cv.dataset.texto, cv.dataset.cls), { w: 220, h: 120, cell: 4.2, transparent: true }));
+  }
+  // papel: azulejo de fibras sobre toda la página
+  function papel() {
+    if (typeof Riso === "undefined" || document.documentElement.style.getPropertyValue("--riso-paper")) return;
+    try { document.documentElement.style.setProperty("--riso-paper", `url(${Riso.paperTile(240)})`); document.documentElement.classList.add("riso"); } catch (e) {}
+  }
+  return { print, init, papel, stats: () => [...prints.entries()].map(([cv, st]) => [cv.className, cv.width, cv.height, st.visible, st.ms && st.ms.map(x => x.toFixed(1))]) };
+})();
+function risoInit() { try { RisoUI.papel(); RisoUI.init(document); } catch (e) { console.warn("riso", e); } }
 
 // Motor del modelo financiero (misma lógica que el Excel maestro).
 function computeModel(cfg, opts) {
@@ -3578,7 +3953,8 @@ function mk(id, cfg, kind) { const el = document.getElementById(id); if (!el || 
   if (!S.animNow) cfg.options.animation = false; else if (kind === "trace") animTrace(cfg.options); else animBars(cfg.options, kind || 70);
   lazyChart(el.closest(".card") || el, () => { if (!el.isConnected || charts[id]) return; charts[id] = new Chart(el, cfg); }, S.animNow); }
 function killCharts() { cancelPending(); for (const k in charts) { try { charts[k].destroy(); } catch (e) {} delete charts[k]; } }
-const sec = (t, k) => `<div class="sec"><div class="banner"><h2>${t}</h2></div>${k ? `<p class="kicker">${k}</p>` : ""}</div>`;
+const SELLOS_SEC = { "Lo invertido": "monedas", "La gente": "gente", "Pendientes": "lista", "Registrar el día": "cazuela", "El local": "agave" };
+const sec = (t, k) => `<div class="sec${SELLOS_SEC[t] ? " con-sello" : ""}"><div class="banner"><h2>${t}</h2></div>${k ? `<p class="kicker">${k}</p>` : ""}${SELLOS_SEC[t] ? `<canvas class="sello-sec" data-sello="${SELLOS_SEC[t]}" aria-hidden="true"></canvas>` : ""}</div>`;
 
 // ---------- datos reales ----------
 function real() {
@@ -3611,7 +3987,7 @@ function renderTop() {
     <h1 class="statement" style="margin-top:16px">Cada semana el negocio gasta <b>${$$(sm.venta)}</b>, incluyendo ${$$(M.P.Renta_mensual / SPM())} de renta.</h1>
     <p class="lead">Por eso hay que vender <b>mínimo ${$$(sm.venta)} a la semana</b> para no perder. Lo que se venda arriba de eso es ganancia.</p>
     <div class="sum"><div><div class="l">Venta mínima al día</div><div class="v">${$$(sm.dia)}</div></div><div><div class="l">Clientes al día</div><div class="v">${n0(sm.cliDia)}</div></div><div><div class="l">Domingo (día fuerte)</div><div class="v">${$$(sm.venta * M.esc.dom / M.esc.semana)}</div></div></div>
-    </div><div class="logowrap"><div class="logofig" role="img" aria-label="Logo de El Jalisciense Birriería" style="background-image:url('${LOGO}')"></div></div></div>${olasSVG()}</header>`;
+    </div><div class="logowrap"><canvas class="riso-sol" aria-hidden="true"></canvas><div class="logofig" role="img" aria-label="Logo de El Jalisciense Birriería" style="background-image:url('${LOGO}')"></div></div></div>${olasSVG()}</header>`;
 }
 function renderTabs() { $("#tabs").innerHTML = TABS.map(([id, l]) => `<button role="tab" aria-selected="${S.tab === id}" data-tab="${id}">${l}</button>`).join(""); }
 function setTab(id) { S.tab = id; S.anim = true; try { history.replaceState(null, "", "#" + id); } catch (e) {} renderTabs(); const m = $("#main"); m.classList.remove("swap"); void m.offsetWidth; m.classList.add("swap"); render(); window.scrollTo({ top: 0 }); }
@@ -3623,7 +3999,7 @@ function vInicio() {
   if (!H) sal = `<div class="card"><div class="health">${gaugeSVG(0, "wait")}<div><h3>Salud del negocio</h3><div class="note" style="margin:0">Cuando se registre la primera venta, aquí se verá si la semana va arriba o abajo de lo mínimo. Se registra en “Registrar el día”.</div></div></div></div>`;
   else { const cls = H.r >= 1 ? "ok" : H.r >= 0.85 ? "mid" : "bad", ic = H.r >= 1 ? "✓" : H.r >= 0.85 ? "!" : "✗";
     const txt = H.r >= 1 ? "Va bien: arriba de lo mínimo." : H.r >= 0.85 ? "Va justo: cerca de lo mínimo." : "Va abajo: falta vender para cubrir gastos.";
-    sal = `<div class="card"><div class="health">${gaugeSVG(H.r, cls)}<div><p class="lbl">Salud del negocio · semana ${H.wk}</p><h3 style="font-size:20px">${txt}</h3>
+    sal = `<div class="card con-sello-salud"><canvas class="sello-salud" data-texto="${cls === "ok" ? "VA BIEN" : cls === "mid" ? "VA JUSTO" : "OJO"}" data-cls="${cls}" aria-hidden="true"></canvas><div class="health">${gaugeSVG(H.r, cls)}<div><p class="lbl">Salud del negocio · semana ${H.wk}</p><h3 style="font-size:20px">${txt}</h3>
       <div class="note" style="margin:0">Van <b>${$$(H.vendido)}</b> vendidos en ${H.dias} día${H.dias === 1 ? "" : "s"}; a estas alturas lo mínimo era ${$$(H.metaHoy)}. Meta de toda la semana: ${$$(sm.venta)}.${H.prevV ? ` La semana pasada se vendió ${$$(H.prevV)} y quedó una ganancia de unos <b>${$$(H.prevG)}</b>.` : ""}</div>
       <div class="bar" style="margin-top:10px"><span style="--w:${Math.min(100, H.vendido / sm.venta * 100)}%;background:var(--${cls === "ok" ? "green-2" : cls === "mid" ? "amber" : "chile"})"></span></div></div></div></div>`; }
   // gastos semanales
@@ -3805,7 +4181,7 @@ function render() {
   recompute(); renderTop(); initCola(); killCharts();
   const V = { inicio: vInicio, inversion: vInversion, pendientes: vPendientes, registro: vRegistro, local: vLocal };
   $("#main").innerHTML = (V[S.tab] || vInicio)();
-  motionPass($("#main"), S.animNow);
+  motionPass($("#main"), S.animNow); if (typeof risoInit === "function") risoInit();
   if (S.tab === "inicio") cInicio(); if (S.tab === "registro") cRegistro(); if (S.tab === "local") bindLocal();
   bind();
   $("#foot").innerHTML = S.dbState === "ok" ? `Datos de la hoja de Google · cargados ${lastLoad ? lastLoad.toLocaleTimeString("es-MX", { hour: "2-digit", minute: "2-digit" }) : ""}${SHEET_URL ? ` · <a href="${SHEET_URL}" target="_blank" rel="noopener" style="color:var(--cream)">abrir la hoja</a>` : ""}` : S.dbState === "sinurl" ? "Copia sin conectar a la hoja" : S.dbState === "sin" ? "Sin conexión con la hoja: datos de respaldo" : "Cargando datos…";
