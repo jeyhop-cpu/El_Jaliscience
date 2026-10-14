@@ -940,7 +940,7 @@ function computeModel(cfg, opts) {
 </script>
 <script>
 // ═══════════ CONFIGURACIÓN: pega aquí la dirección del script de Google (termina en /exec) ═══════════
-const API_URL = "https://script.google.com/macros/s/AKfycbyII7_7Jy6GlKZp6wg7UXZwghXgqOZbV5AW_EvEAd56I-6u4TqK3Qccf-OmGLBvVdwg5g/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycby68JHzaMypLFfhkDALvXHLecgC3yR64HNCWBm8Uk3RhNOnGLCsAEIj-lYYjqXzZ1KNIQ/exec";
 // (Opcional) dirección de la hoja de Google, para mostrar un enlace "abrir la hoja"
 const SHEET_URL = "";
 // ═════════════════════════════════════════════════════════════════════════════════════════════════
@@ -955,7 +955,7 @@ const DEFAULT_CONFIG = {
   "Dias_semana_abiertos": 7,
   "Hora_apertura": 8,
   "Hora_cierre": 18,
-  "Horas_dia": 10, 
+  "Horas_dia": 10,
   "Mesas": 8,
   "Sillas": 32,
   "Bancos_barra": 2,
@@ -973,7 +973,7 @@ const DEFAULT_CONFIG = {
   "Dias_ayudante_semana": 2,
   "Renta_mensual": 14000,
   "Deposito_renta": 14000,
-  "Internet_mes": 500,
+  "Internet_mes": 450,
   "Luz_mes": 800,
   "Agua_servicio": 0,
   "Limpieza_semana": 250,
@@ -1973,26 +1973,14 @@ const DEFAULT_CONFIG = {
    "tipo": "fija"
   },
   {
-   "concepto": "Platos extendidos (2 cajas de 40)",
+   "concepto": "Loza de barro y servicio: platos para birria y para tacos, servilleteros, salseras, cantaritos y cazuelas de barro",
    "cat": "Loza y servicio",
-   "cant": 80,
-   "pu": 15,
-   "estatus": "Por comprar",
+   "cant": 1,
+   "pu": 8500,
+   "estatus": "Pagado",
    "vida": 24,
    "confianza": "Confirmado",
-   "nota": "$15 por plato comprando por caja.",
-   "key": null,
-   "tipo": "fija"
-  },
-  {
-   "concepto": "Platos hondos para birria",
-   "cat": "Loza y servicio",
-   "cant": 80,
-   "pu": 25,
-   "estatus": "Por comprar",
-   "vida": 24,
-   "confianza": "Estimado",
-   "nota": "$18–25 por plato (tío Rigo); se usa $25.",
+   "nota": "Compra del 14-oct-2026 (reportada por Leon).",
    "key": null,
    "tipo": "fija"
   },
@@ -2009,14 +1997,38 @@ const DEFAULT_CONFIG = {
    "tipo": "fija"
   },
   {
-   "concepto": "Salseras de plástico",
-   "cat": "Loza y servicio",
-   "cant": 35,
-   "pu": 30,
-   "estatus": "Por comprar",
-   "vida": 24,
-   "confianza": "Estimado",
-   "nota": "Precio no conocido.",
+   "concepto": "Televisión con instalación",
+   "cat": "Mobiliario",
+   "cant": 1,
+   "pu": 12200,
+   "estatus": "Pagado",
+   "vida": 60,
+   "confianza": "Confirmado",
+   "nota": "Para pasar partidos y eventos. Compra del 14-oct-2026.",
+   "key": null,
+   "tipo": "fija"
+  },
+  {
+   "concepto": "Instalación de internet (Total Play)",
+   "cat": "Instalaciones",
+   "cant": 1,
+   "pu": 700,
+   "estatus": "Pagado",
+   "vida": 36,
+   "confianza": "Confirmado",
+   "nota": "Pago único de instalación; la mensualidad va en gastos fijos.",
+   "key": null,
+   "tipo": "fija"
+  },
+  {
+   "concepto": "Jarcería (escobas, jaladores, cubetas, trapos)",
+   "cat": "Limpieza",
+   "cant": 1,
+   "pu": 1300,
+   "estatus": "Pagado",
+   "vida": 6,
+   "confianza": "Confirmado",
+   "nota": "Compra del 14-oct-2026.",
    "key": null,
    "tipo": "fija"
   },
@@ -2033,14 +2045,14 @@ const DEFAULT_CONFIG = {
    "tipo": "fija"
   },
   {
-   "concepto": "Servilleteros (8), saleros (10) y palilleros (3)",
+   "concepto": "Saleros (10) y palilleros (3)",
    "cat": "Loza y servicio",
    "cant": 1,
-   "pu": 1000,
+   "pu": 400,
    "estatus": "Por comprar",
    "vida": 24,
    "confianza": "Estimado",
-   "nota": "Miguel calcula ~$1,000.",
+   "nota": "Los servilleteros ya vinieron con la loza.",
    "key": null,
    "tipo": "fija"
   },
@@ -2213,18 +2225,6 @@ const DEFAULT_CONFIG = {
    "tipo": "fija"
   },
   {
-   "concepto": "Jergas y trapos (manos, tortillas, piso)",
-   "cat": "Utensilios",
-   "cant": 1,
-   "pu": 250,
-   "estatus": "Por comprar",
-   "vida": 6,
-   "confianza": "Estimado",
-   "nota": "",
-   "key": null,
-   "tipo": "fija"
-  },
-  {
    "concepto": "Garrafones propios para recarga",
    "cat": "Utensilios",
    "cant": 6,
@@ -2315,11 +2315,6 @@ const DEFAULT_CONFIG = {
    "concepto": "Sistema de cámaras",
    "monto": 3000,
    "nota": "Miguel: 'como $3,000'."
-  },
-  {
-   "concepto": "Pantalla (partidos)",
-   "monto": 7000,
-   "nota": "Estimado; cotizar."
   },
   {
    "concepto": "Bocina",
@@ -3290,7 +3285,7 @@ const DEFAULT_PEND = [
   "n": 23,
   "prioridad": "Media",
   "tema": "Inversión",
-  "texto": "Cotizar lo que falta: vitroleros, cacerola, cucharas de cocina, charolas, bandejas, coladores, tortilleros, botes, atomizador, jergas, garrafones propios.",
+  "texto": "Cotizar lo que falta: vitroleros, cacerola, cucharas de cocina, charolas, bandejas, coladores, tortilleros, botes, atomizador, garrafones propios.",
   "porque": "Hoy están estimados.",
   "donde": "Inversion",
   "responsable": "Miguel",
@@ -3394,7 +3389,7 @@ const DEFAULT_PEND = [
   "n": 31,
   "prioridad": "Baja",
   "tema": "Inversión",
-  "texto": "Cotizar pantalla, bocina, uniformes y vasos de vidrio.",
+  "texto": "Cotizar bocina, uniformes y vasos de vidrio (la pantalla ya se compró).",
   "porque": "Inversiones futuras.",
   "donde": "Inversion (futuras)",
   "responsable": "Miguel",
