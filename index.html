@@ -522,6 +522,15 @@ nav.tabs button[aria-selected="true"] { box-shadow: 2.5px 2.5px 0 0 rgba(74,123,
 .logowrap { position: relative; }
 .riso-sol { position: absolute; left: 50%; top: 50%; width: min(126%, 580px); aspect-ratio: 1; transform: translate(-50%, -52%); pointer-events: none; opacity: .92; mix-blend-mode: multiply; }
 .logofig { position: relative; }
+/* logo animado: letrero con focos + emblema en sprites (8 cuadros a 8 por segundo) */
+.logo-anim { background: #F6EFE1 !important; overflow: hidden; }
+.logo-anim .letrero { position: absolute; left: 4%; bottom: 4.5%; width: 92%; height: auto; display: block; filter: drop-shadow(0 6px 10px rgba(20,50,40,.35)); }
+.logo-anim .emblema { position: absolute; left: 19.5%; top: 0; width: 62%; aspect-ratio: 456 / 342; background-size: 800% 100%; background-repeat: no-repeat; background-position: 0 0; filter: drop-shadow(0 8px 10px rgba(20,50,40,.3)); }
+html.anim .logo-anim .emblema, .logo-anim.galopa .emblema { animation: galope 1s steps(8, jump-none) infinite; }
+@keyframes galope { from { background-position-x: 0; } to { background-position-x: 100%; } }
+.logo-anim .focos { position: absolute; pointer-events: none; mix-blend-mode: screen; }
+.logo-anim.sin-sprites .emblema, .logo-anim.sin-sprites .letrero, .logo-anim.sin-sprites .focos { display: none; }
+@media (prefers-reduced-motion: reduce) { .logo-anim .emblema { animation: none !important; } }
 @media (max-width: 720px) { .riso-sol { width: 112%; } }
 
 /* sellos impresos junto a cada título de sección */
@@ -1124,7 +1133,45 @@ const RisoUI = (() => {
   }
   return { print, init, papel, stats: () => [...prints.entries()].map(([cv, st]) => [cv.className, cv.width, cv.height, st.visible, st.ms && st.ms.map(x => x.toFixed(1))]) };
 })();
-function risoInit() { try { RisoUI.papel(); RisoUI.init(document); } catch (e) { console.warn("riso", e); } }
+function risoInit() { try { RisoUI.papel(); RisoUI.init(document); if (typeof initLogoAnim === "function") initLogoAnim(); } catch (e) { console.warn("riso", e); } }
+
+// ───────── Logo animado: emblema en sprites riso (8 cuadros, de ChatGPT) sobre el letrero con focos de marquesina ─────────
+const LOGO_FOCOS = [[0.0259, 0.3863], [0.0259, 0.2423], [0.0304, 0.1096], [0.0741, 0.1068], [0.1206, 0.1068], [0.166, 0.1069], [0.2129, 0.1069], [0.2605, 0.1068], [0.3087, 0.1068], [0.3567, 0.1068], [0.4034, 0.107], [0.4521, 0.1069], [0.5006, 0.1068], [0.55, 0.1066], [0.5986, 0.1068], [0.6473, 0.1068], [0.6957, 0.1068], [0.7443, 0.1067], [0.7922, 0.1068], [0.8381, 0.1068], [0.8828, 0.1068], [0.9267, 0.1069], [0.9704, 0.1092], [0.9755, 0.2422], [0.9754, 0.3864], [0.9753, 0.5293], [0.9755, 0.6734], [0.9724, 0.8177], [0.9294, 0.8507], [0.883, 0.8508], [0.8373, 0.8508], [0.7912, 0.8509], [0.7442, 0.851], [0.6956, 0.8507], [0.6473, 0.851], [0.5986, 0.8509], [0.5499, 0.8508], [0.5002, 0.8508], [0.4503, 0.8508], [0.3989, 0.8509], [0.3485, 0.8509], [0.3009, 0.8509], [0.254, 0.8508], [0.2077, 0.8509], [0.1615, 0.851], [0.115, 0.8509], [0.0684, 0.8508], [0.0285, 0.8178], [0.0259, 0.6735], [0.0259, 0.5294]];
+function logoAnimHTML(fallback) {
+  const G = typeof GAL !== "undefined" ? GAL : "galeria/";
+  return `<div class="logofig logo-anim galopa" role="img" aria-label="Logo de El Jalisciense Birriería: charro coleando un toro sobre el letrero" data-fallback="${fallback}">
+    <div class="emblema" style="background-image:url('${G}logo-sprite.webp')"></div>
+    <img class="letrero" src="${G}logo-letrero.webp" alt="" decoding="async">
+    <canvas class="focos" aria-hidden="true"></canvas></div>`;
+}
+function initLogoAnim() {
+  const fig = document.querySelector(".logo-anim"); if (!fig || fig.dataset.ready) return; fig.dataset.ready = "1";
+  const img = fig.querySelector(".letrero"), cv = fig.querySelector(".focos"), g = cv.getContext("2d");
+  // si no cargan los sprites (sin red), se queda la foto del bordado
+  img.addEventListener("error", () => { fig.classList.add("sin-sprites"); fig.style.backgroundImage = `url('${fig.dataset.fallback}')`; });
+  const rm = typeof RM !== "undefined" ? RM : matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let raf = 0, last = 0, visible = true;
+  function fit() { const r = img.getBoundingClientRect(), dpr = Math.min(2, devicePixelRatio || 1); if (!r.width) return false; cv.style.left = img.offsetLeft + "px"; cv.style.top = img.offsetTop + "px"; cv.style.width = r.width + "px"; cv.style.height = r.height + "px"; cv.width = Math.round(r.width * dpr); cv.height = Math.round(r.height * dpr); g.setTransform(dpr, 0, 0, dpr, 0, 0); return true; }
+  function draw(now) {
+    raf = 0; if (!fit()) return; last = now;
+    const W = parseFloat(cv.style.width), H = parseFloat(cv.style.height), t = now / 1000, paso = Math.floor(t * 5), R = W * .0115;
+    g.clearRect(0, 0, W, H);
+    LOGO_FOCOS.forEach(([x, y], i) => {
+      // marquesina: corre una luz de cada tres; de vez en cuando un foco parpadea
+      const on = rm ? true : ((i + paso) % 3 === 0) || (Math.sin(t * 7 + i * 13.7) > .985);
+      const cx = x * W, cy = y * H;
+      if (on) { const gr = g.createRadialGradient(cx, cy, R * .3, cx, cy, R * 3.2); gr.addColorStop(0, "rgba(255,236,150,.95)"); gr.addColorStop(.35, "rgba(255,200,60,.55)"); gr.addColorStop(1, "rgba(255,180,40,0)"); g.fillStyle = gr; g.beginPath(); g.arc(cx, cy, R * 3.2, 0, Math.PI * 2); g.fill(); g.fillStyle = "#FFF4C8"; g.beginPath(); g.arc(cx, cy, R * .95, 0, Math.PI * 2); g.fill(); }
+      else { g.fillStyle = "rgba(40,60,40,.45)"; g.beginPath(); g.arc(cx, cy, R * .9, 0, Math.PI * 2); g.fill(); }
+    });
+    if (!rm && visible && !document.hidden) raf = requestAnimationFrame(tick);
+  }
+  function tick(now) { if (now - last > 90) draw(now); else raf = requestAnimationFrame(tick); }
+  const start = () => { if (!raf) raf = requestAnimationFrame(draw); };
+  img.addEventListener("load", start); if (img.complete && img.naturalWidth) start();
+  if ("IntersectionObserver" in window) new IntersectionObserver(es => { visible = es[0].isIntersecting; if (visible) start(); }, { threshold: .05 }).observe(fig);
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) start(); });
+  if ("ResizeObserver" in window) new ResizeObserver(() => start()).observe(fig);
+}
 
 // Motor del modelo financiero (misma lógica que el Excel maestro).
 function computeModel(cfg, opts) {
@@ -3987,7 +4034,7 @@ function renderTop() {
     <h1 class="statement" style="margin-top:16px">Cada semana el negocio gasta <b>${$$(sm.venta)}</b>, incluyendo ${$$(M.P.Renta_mensual / SPM())} de renta.</h1>
     <p class="lead">Por eso hay que vender <b>mínimo ${$$(sm.venta)} a la semana</b> para no perder. Lo que se venda arriba de eso es ganancia.</p>
     <div class="sum"><div><div class="l">Venta mínima al día</div><div class="v">${$$(sm.dia)}</div></div><div><div class="l">Clientes al día</div><div class="v">${n0(sm.cliDia)}</div></div><div><div class="l">Domingo (día fuerte)</div><div class="v">${$$(sm.venta * M.esc.dom / M.esc.semana)}</div></div></div>
-    </div><div class="logowrap"><canvas class="riso-sol" aria-hidden="true"></canvas><div class="logofig" role="img" aria-label="Logo de El Jalisciense Birriería" style="background-image:url('${LOGO}')"></div></div></div>${olasSVG()}</header>`;
+    </div><div class="logowrap"><canvas class="riso-sol" aria-hidden="true"></canvas>${logoAnimHTML(LOGO)}</div></div>${olasSVG()}</header>`;
 }
 function renderTabs() { $("#tabs").innerHTML = TABS.map(([id, l]) => `<button role="tab" aria-selected="${S.tab === id}" data-tab="${id}">${l}</button>`).join(""); }
 function setTab(id) { S.tab = id; S.anim = true; try { history.replaceState(null, "", "#" + id); } catch (e) {} renderTabs(); const m = $("#main"); m.classList.remove("swap"); void m.offsetWidth; m.classList.add("swap"); render(); window.scrollTo({ top: 0 }); }
