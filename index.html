@@ -1261,15 +1261,18 @@ function computeModel(cfg, opts) {
   const compraArranque = ins.reduce((s, i) => s + i.pu * (i.arranque || 0), 0);
 
   // inversión
-  const inv = cfg.inversion.map(x => { const pu = ev(x.pu === "Deposito_renta" ? P.Deposito_renta : x.pu); const total = x.cant * pu;
+  const invTodo = cfg.inversion.map(x => { const pu = ev(x.pu === "Deposito_renta" ? P.Deposito_renta : x.pu); const total = x.cant * pu;
     return Object.assign({}, x, { puV: pu, total, amort: x.vida ? total / x.vida : 0 }); });
+  // compras reales de insumos (tipo "compra"): no son activos; cuentan dentro de la primera compra de insumos
+  const compras = invTodo.filter(x => x.tipo === "compra"), inv = invTodo.filter(x => x.tipo !== "compra");
+  const comprasReal = compras.reduce((s, x) => s + x.total, 0);
   const invActivos = inv.reduce((s, x) => s + x.total, 0);
   const sumSt = st => inv.filter(x => x.estatus === st).reduce((s, x) => s + x.total, 0);
   const deprec = inv.reduce((s, x) => s + x.amort, 0);
   const ct = [
     { concepto: "Primer mes de renta", monto: P.Renta_mensual },
     { concepto: "Primer llenado de gas (90%)", monto: P.Litros_por_llenado * P.Precio_gas_litro },
-    { concepto: "Primera compra de insumos, refrescos y desechables", monto: compraArranque },
+    { concepto: "Primera compra de insumos, refrescos y desechables", monto: Math.max(compraArranque, comprasReal), plan: compraArranque, real: comprasReal },
     { concepto: "Fondo de caja (cambio)", monto: cfg.fondoCaja || 0 },
   ];
   const capTrabajo = ct.reduce((s, x) => s + x.monto, 0);
@@ -1353,7 +1356,7 @@ function computeModel(cfg, opts) {
   horas.forEach(x => { x.occLV = x.lv / capHora; x.occDom = x.dom / capHora; });
 
   return { P, esc: act, escs, ins, menu, ticket, fcPond, kgBirriaCli, tacosCli, need, ratioCompra, cliJustifican, compraArranque,
-    inv, invActivos, invTotal, invCredito, invEfectivo, invPagado: sumSt("Pagado"), invPorComprar: sumSt("Por comprar"), invPorConfirmar: sumSt("Por confirmar"),
+    inv, compras, comprasReal, compraArranque, comprasFalta: Math.max(0, compraArranque - comprasReal), invActivos, invTotal, invCredito, invEfectivo, invPagado: sumSt("Pagado") + comprasReal, invPorComprar: sumSt("Por comprar"), invPorConfirmar: sumSt("Por confirmar"),
     deprec, ct, capTrabajo, credMat, credRef, credMes, co, gastosOp, sueldos, gastosTot, varPct, cm, eq, meta, sem, meses, mesRec, comparativo,
     capHora, capDia: capHora * P.Horas_dia, horas, margenSeg: 1 - eq[1].cliDia / (cliSem / 7), cliSem };
 }
@@ -1636,32 +1639,32 @@ const DEFAULT_CONFIG = {
    "freqDias": 7
   },
   {
-   "nombre": "Chile seco (árbol / guajillo — verificar)",
+   "nombre": "Chile de árbol",
    "cat": "Chiles y especias",
-   "pres": "Costal 15 kg",
-   "precio": 1800,
-   "contenido": 15,
+   "pres": "Por kilo",
+   "precio": 110,
+   "contenido": 1,
    "unidad": "kg",
    "planSem": 5,
-   "arranque": 15,
+   "arranque": 10,
    "entra": "Adobo por kg de carne",
-   "nota": "Costal de 15 kg a $120/kg. Supuesto: dura 3 semanas.",
-   "estatus": "Pendiente",
+   "nota": "La Mexicana 16-oct: 10 kg a $110/kg ($1,100).",
+   "estatus": "Confirmado",
    "key": "adobo",
    "freqDias": 21
   },
   {
-   "nombre": "Chile puya",
+   "nombre": "Chile puya (pulla)",
    "cat": "Chiles y especias",
-   "pres": "Costal 10 kg",
-   "precio": 1000,
-   "contenido": 10,
+   "pres": "Por kilo",
+   "precio": 115,
+   "contenido": 1,
    "unidad": "kg",
    "planSem": 3.3333,
-   "arranque": 10,
+   "arranque": 5,
    "entra": "Adobo por kg de carne",
-   "nota": "~$100/kg, costalito de 10 kg. Supuesto: dura 3 semanas.",
-   "estatus": "Pendiente",
+   "nota": "La Mexicana 16-oct: 5 kg a $115/kg ($575).",
+   "estatus": "Confirmado",
    "key": "adobo",
    "freqDias": 21
   },
@@ -1681,16 +1684,16 @@ const DEFAULT_CONFIG = {
    "freqDias": 10
   },
   {
-   "nombre": "Sal",
+   "nombre": "Sal fina",
    "cat": "Chiles y especias",
-   "pres": "Bolsa 10 kg",
-   "precio": 250,
-   "contenido": 10,
+   "pres": "Por kilo",
+   "precio": 18.33,
+   "contenido": 1,
    "unidad": "kg",
    "planSem": 7,
-   "arranque": 10,
+   "arranque": 18,
    "entra": "Adobo por kg de carne",
-   "nota": "≈1 kg por día.",
+   "nota": "La Mexicana 16-oct: 18 kg a $18.33/kg ($330). ≈1 kg por día.",
    "estatus": "Confirmado",
    "key": "adobo",
    "freqDias": 10
@@ -1714,44 +1717,44 @@ const DEFAULT_CONFIG = {
    "nombre": "Arroz (horchata)",
    "cat": "Abarrotes",
    "pres": "Por kilo",
-   "precio": 25,
+   "precio": 17,
    "contenido": 1,
    "unidad": "kg",
    "planSem": 3,
-   "arranque": 3,
+   "arranque": 10,
    "entra": "Costo agua por litro (parámetro)",
-   "nota": "Cantidad por definir.",
-   "estatus": "Pendiente",
+   "nota": "La Mexicana 16-oct: 10 kg a $17/kg (Arroz Ole).",
+   "estatus": "Confirmado",
    "key": "agua",
    "freqDias": 7
   },
   {
-   "nombre": "Azúcar",
+   "nombre": "Azúcar estándar",
    "cat": "Abarrotes",
-   "pres": "Bulto 25 kg",
-   "precio": 500,
-   "contenido": 25,
+   "pres": "Por kilo",
+   "precio": 25,
+   "contenido": 1,
    "unidad": "kg",
    "planSem": 10,
-   "arranque": 25,
+   "arranque": 19.6,
    "entra": "Costo agua por litro (parámetro)",
-   "nota": "Solo viene en bulto de 25 kg. Rendimiento por calar.",
-   "estatus": "Estimado",
+   "nota": "La Mexicana 16-oct: 19.6 kg a $25/kg ($490). Rendimiento por calar.",
+   "estatus": "Confirmado",
    "key": "agua",
    "freqDias": 17
   },
   {
-   "nombre": "Flor de jamaica",
+   "nombre": "Flor de jamaica (Sudán)",
    "cat": "Abarrotes",
    "pres": "Por kilo",
-   "precio": 220,
+   "precio": 90,
    "contenido": 1,
    "unidad": "kg",
    "planSem": 1.5,
-   "arranque": 2,
+   "arranque": 4,
    "entra": "Costo agua por litro (parámetro)",
-   "nota": "Precio del costal pendiente.",
-   "estatus": "Pendiente",
+   "nota": "La Mexicana 16-oct: 4 kg a $90/kg ($360).",
+   "estatus": "Confirmado",
    "key": "agua",
    "freqDias": 7
   },
@@ -1771,34 +1774,34 @@ const DEFAULT_CONFIG = {
    "freqDias": 7
   },
   {
-   "nombre": "Servilletas",
+   "nombre": "Servilletas Elite (paquete)",
    "cat": "Desechables",
-   "pres": "Caja",
-   "precio": 500,
+   "pres": "Paquete",
+   "precio": 37.92,
    "contenido": 1,
-   "unidad": "caja",
-   "planSem": 0.5,
-   "arranque": 1,
+   "unidad": "paquete",
+   "planSem": 3,
+   "arranque": 12,
    "entra": "Desechable por cliente (parámetro)",
-   "nota": "$480–500 la caja. ¿Cuántos paquetes trae?",
-   "estatus": "Pendiente",
+   "nota": "La Mexicana 16-oct: 12 paquetes a $37.92 ($455).",
+   "estatus": "Confirmado",
    "key": "desech",
-   "freqDias": 14
+   "freqDias": 7
   },
   {
-   "nombre": "Vaso de litro",
+   "nombre": "Vaso térmico 32 oz / litro (Dart 32J32)",
    "cat": "Desechables",
-   "pres": "Caja",
-   "precio": 450,
+   "pres": "Pieza",
+   "precio": 1.45,
    "contenido": 1,
-   "unidad": "caja",
-   "planSem": 0.25,
-   "arranque": 1,
+   "unidad": "pza",
+   "planSem": 75,
+   "arranque": 300,
    "entra": "Desechable por cliente (parámetro)",
-   "nota": "¿Cuántos vasos trae? (Miguel cree 200–500)",
-   "estatus": "Pendiente",
+   "nota": "La Mexicana 16-oct: 300 piezas a $1.45 ($435).",
+   "estatus": "Confirmado",
    "key": "desech",
-   "freqDias": 28
+   "freqDias": 7
   },
   {
    "nombre": "Vaso de unicel 1/2 L (consomé)",
@@ -1816,77 +1819,77 @@ const DEFAULT_CONFIG = {
    "freqDias": 28
   },
   {
-   "nombre": "Tapa de unicel",
+   "nombre": "Tapa térmica 32 oz (Dart 32RL)",
    "cat": "Desechables",
-   "pres": "Caja",
-   "precio": 510,
+   "pres": "Pieza",
+   "precio": 1.05,
    "contenido": 1,
-   "unidad": "caja",
-   "planSem": 0.25,
-   "arranque": 1,
+   "unidad": "pza",
+   "planSem": 125,
+   "arranque": 500,
    "entra": "Empaque para llevar (parámetro)",
-   "nota": "Cantidad por caja pendiente.",
-   "estatus": "Pendiente",
+   "nota": "La Mexicana 16-oct: 500 piezas a $1.05 ($525).",
+   "estatus": "Confirmado",
    "key": "desech",
-   "freqDias": 28
+   "freqDias": 7
   },
   {
-   "nombre": "Tapa plástica chica",
+   "nombre": "Tapa plástica 32 oz (Dart 32SL)",
    "cat": "Desechables",
-   "pres": "Caja (¿millar?)",
-   "precio": 765,
+   "pres": "Pieza",
+   "precio": 0.85,
    "contenido": 1,
-   "unidad": "caja",
-   "planSem": 0.1,
-   "arranque": 1,
+   "unidad": "pza",
+   "planSem": 50,
+   "arranque": 200,
    "entra": "Empaque para llevar (parámetro)",
-   "nota": "Miguel cree que trae un millar.",
-   "estatus": "Pendiente",
+   "nota": "La Mexicana 16-oct: 200 piezas a $0.85 ($170).",
+   "estatus": "Confirmado",
    "key": "desech",
-   "freqDias": 70
+   "freqDias": 7
   },
   {
-   "nombre": "Vaso plástico 1/2 L",
+   "nombre": "Vaso plástico 16 oz (V16L)",
    "cat": "Desechables",
-   "pres": "Caja",
-   "precio": 780,
+   "pres": "Pieza",
+   "precio": 0.8,
    "contenido": 1,
-   "unidad": "caja",
-   "planSem": 0.2,
-   "arranque": 1,
+   "unidad": "pza",
+   "planSem": 50,
+   "arranque": 200,
    "entra": "Desechable por cliente (parámetro)",
-   "nota": "Cantidad por caja pendiente.",
-   "estatus": "Pendiente",
+   "nota": "La Mexicana 16-oct: 200 piezas a $0.80 ($160).",
+   "estatus": "Confirmado",
    "key": "desech",
-   "freqDias": 35
+   "freqDias": 7
   },
   {
-   "nombre": "Tapa plástica 1/2 L",
+   "nombre": "Tapa plástica 16 oz (Primo TPR16L)",
    "cat": "Desechables",
-   "pres": "Caja",
-   "precio": 420,
+   "pres": "Pieza",
+   "precio": 0.5,
    "contenido": 1,
-   "unidad": "caja",
-   "planSem": 0.2,
-   "arranque": 1,
+   "unidad": "pza",
+   "planSem": 50,
+   "arranque": 200,
    "entra": "Desechable por cliente (parámetro)",
-   "nota": "Cantidad por caja pendiente.",
-   "estatus": "Pendiente",
+   "nota": "La Mexicana 16-oct: 200 piezas a $0.50 ($100).",
+   "estatus": "Confirmado",
    "key": "desech",
-   "freqDias": 35
+   "freqDias": 7
   },
   {
-   "nombre": "Rollo de bolsa",
+   "nombre": "Rollo de bolsa (2030A)",
    "cat": "Desechables",
-   "pres": "Rollo (kg)",
-   "precio": 160,
+   "pres": "Por kilo",
+   "precio": 75,
    "contenido": 1,
-   "unidad": "rollo",
+   "unidad": "kg",
    "planSem": 0.5,
-   "arranque": 1,
+   "arranque": 1.5,
    "entra": "Empaque para llevar (parámetro)",
-   "nota": "~$160 el rollo.",
-   "estatus": "Estimado",
+   "nota": "La Mexicana 16-oct: 1.5 kg a $75/kg ($112.50).",
+   "estatus": "Confirmado",
    "key": "desech",
    "freqDias": 14
   },
@@ -1894,13 +1897,13 @@ const DEFAULT_CONFIG = {
    "nombre": "Bolsa camiseta #0",
    "cat": "Desechables",
    "pres": "Por kilo",
-   "precio": 65,
+   "precio": 75,
    "contenido": 1,
    "unidad": "kg",
    "planSem": 1,
-   "arranque": 3,
+   "arranque": 2,
    "entra": "Empaque para llevar (parámetro)",
-   "nota": "$65/kg; arranque 3 kg.",
+   "nota": "La Mexicana 16-oct: 2 kg a $75/kg (PS rayada).",
    "estatus": "Confirmado",
    "key": "desech",
    "freqDias": 7
@@ -1909,44 +1912,44 @@ const DEFAULT_CONFIG = {
    "nombre": "Bolsa camiseta #1",
    "cat": "Desechables",
    "pres": "Por kilo",
-   "precio": 65,
+   "precio": 70,
    "contenido": 1,
    "unidad": "kg",
    "planSem": 1,
-   "arranque": 3,
+   "arranque": 2,
    "entra": "Empaque para llevar (parámetro)",
-   "nota": "$65/kg.",
+   "nota": "La Mexicana 16-oct: 2 kg a $70/kg (PS rayada).",
    "estatus": "Confirmado",
    "key": "desech",
    "freqDias": 7
   },
   {
-   "nombre": "Papel aluminio",
+   "nombre": "Papel aluminio (Wezer 400)",
    "cat": "Desechables",
    "pres": "Rollo",
-   "precio": 200,
+   "precio": 225,
    "contenido": 1,
    "unidad": "rollo",
    "planSem": 0.25,
    "arranque": 1,
    "entra": "Empaque para llevar (parámetro)",
-   "nota": "~$200 el rollo.",
-   "estatus": "Estimado",
+   "nota": "La Mexicana 16-oct: $225 el rollo.",
+   "estatus": "Confirmado",
    "key": "desech",
    "freqDias": 28
   },
   {
-   "nombre": "Película plástica (playo)",
+   "nombre": "Película plástica (Esapack Chefísimo 1200)",
    "cat": "Desechables",
    "pres": "Rollo",
-   "precio": 350,
+   "precio": 290,
    "contenido": 1,
    "unidad": "rollo",
    "planSem": 0.1,
    "arranque": 1,
    "entra": "Empaque para llevar (parámetro)",
-   "nota": "~$350 el rollo.",
-   "estatus": "Estimado",
+   "nota": "La Mexicana 16-oct: $290 el rollo.",
+   "estatus": "Confirmado",
    "key": "desech",
    "freqDias": 70
   },
@@ -1966,34 +1969,64 @@ const DEFAULT_CONFIG = {
    "freqDias": 28
   },
   {
-   "nombre": "Platos y platitos desechables",
+   "nombre": "Cucharas desechables (Bio)",
    "cat": "Desechables",
-   "pres": "2 paquetes",
-   "precio": 700,
+   "pres": "Pieza",
+   "precio": 0.4,
+   "contenido": 1,
+   "unidad": "pza",
+   "planSem": 25,
+   "arranque": 100,
+   "entra": "Desechable por cliente (parámetro)",
+   "nota": "La Mexicana 16-oct: 100 piezas a $0.40 ($40).",
+   "estatus": "Confirmado",
+   "key": "desech",
+   "freqDias": 7
+  },
+  {
+   "nombre": "Popotes de colores",
+   "cat": "Desechables",
+   "pres": "Bolsa",
+   "precio": 50,
+   "contenido": 1,
+   "unidad": "bolsa",
+   "planSem": 0.25,
+   "arranque": 1,
+   "entra": "Desechable por cliente (parámetro)",
+   "nota": "La Mexicana 16-oct: $50 la bolsa.",
+   "estatus": "Confirmado",
+   "key": "desech",
+   "freqDias": 28
+  },
+  {
+   "nombre": "Charolas Eco 066 y 855 (500 + 500)",
+   "cat": "Desechables",
+   "pres": "Lote",
+   "precio": 240,
    "contenido": 1,
    "unidad": "lote",
    "planSem": 0.25,
    "arranque": 1,
    "entra": "Empaque para llevar (parámetro)",
-   "nota": "~$700 los dos paquetes.",
-   "estatus": "Estimado",
+   "nota": "La Mexicana 16-oct: 500 charolas 066 a $0.19 + 500 charolas 855 a $0.29 ($240).",
+   "estatus": "Confirmado",
    "key": "desech",
    "freqDias": 28
   },
   {
-   "nombre": "Papel para tacos (cortado 4 kg + entero 3 kg)",
+   "nombre": "Papel para tacos (revolución y cortado)",
    "cat": "Desechables",
-   "pres": "Lote",
-   "precio": 500,
+   "pres": "Por kilo",
+   "precio": 32,
    "contenido": 1,
-   "unidad": "lote",
-   "planSem": 0.5,
-   "arranque": 1,
+   "unidad": "kg",
+   "planSem": 2.5,
+   "arranque": 5,
    "entra": "Desechable por cliente (parámetro)",
-   "nota": "$500 todo. Duración por medir.",
-   "estatus": "Estimado",
+   "nota": "La Mexicana 16-oct: 2 kg revolución + 3 kg cortado a $32/kg ($160).",
+   "estatus": "Confirmado",
    "key": "desech",
-   "freqDias": 14
+   "freqDias": 7
   },
   {
    "nombre": "Jabón en polvo para trastes",
@@ -2041,19 +2074,19 @@ const DEFAULT_CONFIG = {
    "freqDias": 7
   },
   {
-   "nombre": "Papel de baño",
+   "nombre": "Papel higiénico (JRI)",
    "cat": "Limpieza",
-   "pres": "Caja",
-   "precio": 250,
+   "pres": "Pieza",
+   "precio": 20,
    "contenido": 1,
-   "unidad": "caja",
-   "planSem": 0.25,
-   "arranque": 1,
+   "unidad": "pza",
+   "planSem": 3,
+   "arranque": 12,
    "entra": "Limpieza (parámetro)",
-   "nota": "Precio estimado; pendiente.",
-   "estatus": "Pendiente",
+   "nota": "La Mexicana 16-oct: 12 piezas a $20 ($240).",
+   "estatus": "Confirmado",
    "key": "limpieza",
-   "freqDias": 28
+   "freqDias": 7
   },
   {
    "nombre": "Jabón líquido para manos",
@@ -2729,6 +2762,44 @@ const DEFAULT_CONFIG = {
    "nota": "",
    "key": null,
    "tipo": "fija"
+  },
+  {
+   "concepto": "Primera surtida de desechables y abarrotes — La Mexicana, Central de Abasto (ticket KBV93300, 16-oct-2026)",
+   "cat": "Insumos (compras hechas)",
+   "cant": 1,
+   "pu": 6517.5,
+   "estatus": "Pagado",
+   "vida": null,
+   "confianza": "Confirmado",
+   "key": "compra_la_mexicana_1",
+   "tipo": "compra",
+   "nota": "Pagado en efectivo ($6,600, cambio $82.50). 24 renglones: desechables, chiles, sal, jamaica, arroz y azúcar.",
+   "incluye": [
+    "Papel higiénico · 12 × $20.00 = $240.00",
+    "Servilleta Elite (paquete) · 12 × $37.92 = $455.00",
+    "Charola 066 Eco · 500 × $0.19 = $95.00",
+    "Charola 855 Eco · 500 × $0.29 = $145.00",
+    "Vaso Dart 32 oz (32J32) · 300 × $1.45 = $435.00",
+    "Vaso plástico 16 oz · 200 × $0.80 = $160.00",
+    "Tapa Primo 16 oz · 200 × $0.50 = $100.00",
+    "Tapa Dart térmica 32 oz · 500 × $1.05 = $525.00",
+    "Tapa Dart plástica 32 oz · 200 × $0.85 = $170.00",
+    "Bolsa camiseta PS rayada #0 (kg) · 2 × $75.00 = $150.00",
+    "Bolsa camiseta PS rayada #1 (kg) · 2 × $70.00 = $140.00",
+    "Película Esapack Chefísimo 1200 · 1 × $290.00 = $290.00",
+    "Aluminio Wezer 400 · 1 × $225.00 = $225.00",
+    "Rollo de bolsa (kg) · 1.5 × $75.00 = $112.50",
+    "Cuchara sopera Bio · 100 × $0.40 = $40.00",
+    "Popote de colores (bolsa) · 1 × $50.00 = $50.00",
+    "Papel revolución (kg) · 2 × $32.00 = $64.00",
+    "Papel cortado (kg) · 3 × $32.00 = $96.00",
+    "Chile de árbol (kg) · 10 × $110.00 = $1,100.00",
+    "Chile pulla (kg) · 5 × $115.00 = $575.00",
+    "Sal fina (kg) · 18 × $18.33 = $330.00",
+    "Jamaica Sudán (kg) · 4 × $90.00 = $360.00",
+    "Arroz Ole c/25 (kg) · 10 × $17.00 = $170.00",
+    "Azúcar estándar (kg) · 19.6 × $25.00 = $490.00"
+   ]
   }
  ],
  "fondoCaja": 1500,
@@ -4115,14 +4186,18 @@ function vInversion() {
     ${x.confianza !== "Confirmado" ? `<div class="d" style="color:var(--chile)">Monto estimado, falta confirmar</div>` : ""}</div>
     <div class="v">${$$(x.total)}<div><span class="pill ${st[x.estatus][0]}">${st[x.estatus][1]}</span></div></div></div>`;
   const top = `<div class="grid g4"><div class="card dark stitch"><p class="lbl">Total invertido</p><div class="big">${$$(M.invTotal)}</div><div class="note">fija + variable + depósito</div></div>
-    <div class="card"><p class="lbl">Ya pagado</p><div class="big green">${$$(sumSt("Pagado") + M.P.Deposito_renta)}</div></div>
+    <div class="card"><p class="lbl">Ya pagado</p><div class="big green">${$$(sumSt("Pagado") + M.P.Deposito_renta + M.comprasReal)}</div>${M.comprasReal ? `<div class="note">incluye ${$$(M.comprasReal)} de insumos ya surtidos</div>` : ""}</div>
     <div class="card"><p class="lbl">A crédito</p><div class="big amber">${$$(sumSt("Crédito"))}</div><div class="note">David y el refrigerador</div></div>
-    <div class="card"><p class="lbl">Falta comprar o confirmar</p><div class="big chile">${$$(sumSt("Por comprar") + sumSt("Por confirmar"))}</div></div></div>`;
+    <div class="card"><p class="lbl">Falta comprar o confirmar</p><div class="big chile">${$$(sumSt("Por comprar") + sumSt("Por confirmar") + M.comprasFalta)}</div>${M.comprasFalta ? `<div class="note">incluye ≈ ${$$(M.comprasFalta)} de insumos por surtir</div>` : ""}</div></div>`;
   const fijaBox = `<div class="card"><div class="grp-h"><h3>Inversión fija · se compra una vez</h3><span class="mid">${$$(totF)}</span></div>
     ${cats.map(c => { const it = fija.filter(x => x.cat === c); return `<p class="lbl" style="margin-top:14px">${esc(c)} · ${$$(it.reduce((s, x) => s + x.total, 0))}</p>${it.map(item).join("")}`; }).join("")}</div>`;
   const varBox = `<div class="card"><div class="grp-h"><h3>Inversión variable · para arrancar</h3><span class="mid">${$$(M.capTrabajo)}</span></div>
-    ${M.ct.map(c => `<div class="inv-item"><div><div class="t">${esc(c.concepto)}</div></div><div class="v">${$$(c.monto)}</div></div>`).join("")}
+    ${M.ct.map(c => `<div class="inv-item"><div><div class="t">${esc(c.concepto)}</div>${c.real ? `<div class="d">Ya surtido: <b>${$$(c.real)}</b>${c.plan > c.real ? ` · falta ≈ ${$$(c.plan - c.real)} (carne, tortilla, verdura, refrescos…)` : ""}</div>` : ""}</div><div class="v">${$$(c.monto)}</div></div>`).join("")}
     <p class="note">Se gasta al operar y se repone con las ventas.</p>
+    ${M.compras.length ? `<div class="grp-h" style="margin-top:18px"><h3>Compras hechas de insumos</h3><span class="mid">${$$(M.comprasReal)}</span></div>
+    ${M.compras.map(x => `<div class="inv-item"><div><div class="t">${esc(x.concepto.split(" — ")[0])}</div><div class="d">${esc((x.concepto.split(" — ")[1] || "").trim())}</div>${x.nota ? `<div class="d">${esc(x.nota)}</div>` : ""}
+      ${x.incluye ? `<details style="margin-top:4px"><summary>Ver el ticket (${x.incluye.length} renglones)</summary><ul class="incl">${x.incluye.map(t => `<li>${esc(t)}</li>`).join("")}</ul></details>` : ""}</div>
+      <div class="v">${$$(x.total)}<div><span class="pill p-ok">Pagado</span></div></div></div>`).join("")}` : ""}
     <div class="grp-h" style="margin-top:18px"><h3>Depósito de renta</h3><span class="mid">${$$(M.P.Deposito_renta)}</span></div><p class="note">Se recupera al terminar el contrato.</p>
     <div class="grp-h" style="margin-top:18px"><h3>Para después</h3><span class="mid">${$$(S.cfg.futuras.reduce((s, f) => s + f.monto, 0))}</span></div>
     ${S.cfg.futuras.map(f => `<div class="inv-item"><div><div class="t">${esc(f.concepto)}</div></div><div class="v">${$$(f.monto)}</div></div>`).join("")}</div>`;
